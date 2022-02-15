@@ -232,5 +232,35 @@ describe('/api/articles/:article_id', () => {
 
     });
 });
+describe('/api/users', () => {
+    describe('HAPPY PATH GET /api/users', () => {
+        test('200 OK - Should return a 200 status code if succesful', () => {
+            return request(app)
+                .get("/api/users")
+                .expect(200)
+        });
+        test('200 OK - should return an array with 1 or more objects in', () => {
+            return request(app)
+                .get("/api/users")
+                .expect(200)
+                .then((response) => {
+                    expect(response.body.users).toBeInstanceOf(Array);
+                    expect(response.body.users.length).toBeGreaterThan(0);
+                })
+        });
+        test('200 OK - Array returned should have objects with correct properties', () => {
+            return request(app)
+                .get("/api/users")
+                .expect(200)
+                .then((response) => {
+                    response.body.users.forEach(user => {
+                        expect(user).toEqual(expect.objectContaining({
+                            username: expect.any(String),
 
+                        }))
+                    })
+                })
+        });
+    });
+});
 

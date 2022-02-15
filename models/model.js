@@ -6,6 +6,11 @@ exports.fetchTopics = async () => {
     return rows
 }
 
+exports.fetchUsers = async () => {
+    const { rows } = await db.query('SELECT * FROM users');
+    return rows
+}
+
 exports.fetchArticleById = async (id) => {
     const { rows } = await db.query('SELECT * FROM articles WHERE article_id = $1;', [id])
 
