@@ -1,4 +1,4 @@
-const { fetchTopics, fetchArticleById } = require("../models/model");
+const { fetchTopics, fetchArticleById, sendArticleVote } = require("../models/model");
 
 exports.getTopics = async (req, res, next) => {
     try {
@@ -12,8 +12,20 @@ exports.getTopics = async (req, res, next) => {
 exports.getArticleById = async (req, res, next) => {
     try {
         const article = await fetchArticleById(req.params.article_id);
-        res.status(200).send(article)
+        res.status(200).send(article);
     } catch (err) {
+        next(err);
+    }
+}
+
+exports.updateArticleVotes = async (req, res, next) => {
+    try {
+
+        const updatedVotes = await sendArticleVote(req.params.article_id, req.body);
+
+        res.status(200).send(updatedVotes);
+    } catch (err) {
+        console.log(err)
         next(err);
     }
 }
