@@ -264,3 +264,38 @@ describe('/api/users', () => {
     });
 });
 
+describe('/api/articles', () => {
+    describe('HAPPY PATH GET /api/articles', () => {
+        test('200 OK - Should return an array of objects with correct data', () => {
+            return request(app)
+                .get("/api/articles")
+                .expect(200)
+                .then((response) => {
+                    expect(response.body.articles).toBeInstanceOf(Array);
+                    expect(response.body.articles.length).toBeGreaterThan(0);
+                    response.body.articles.forEach(article => {
+                        expect(article).toEqual(expect.objectContaining({
+                            author: expect.any(String),
+                            title: expect.any(String),
+                            article_id: expect.any(Number),
+                            body: expect.any(String),
+                            topic: expect.any(String),
+                            created_at: expect.any(String),
+                            votes: expect.any(Number)
+                        }))
+                    })
+                });
+        })
+        test('200 OK - should return array sorted by date created', () => {
+            return request(app)
+                .get("/api/articles")
+                .expect(200)
+                .then((response) => {
+                    expect(response.body.articles).toBeSortedBy('created_at', {
+                        descending: true,
+                    });
+                })
+        });
+
+    })
+})

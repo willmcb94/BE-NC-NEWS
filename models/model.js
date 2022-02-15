@@ -11,6 +11,11 @@ exports.fetchUsers = async () => {
     return rows
 }
 
+exports.fetchArticlesSorted = async () => {
+    const { rows } = await db.query('SELECT * FROM Articles ORDER BY created_at DESC;');
+    return rows
+}
+
 exports.fetchArticleById = async (id) => {
     const { rows } = await db.query('SELECT * FROM articles WHERE article_id = $1;', [id])
 
