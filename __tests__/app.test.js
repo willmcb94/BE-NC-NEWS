@@ -8,6 +8,19 @@ const { convertTimestampToDate } = require('../db/helpers/utils')
 beforeEach(() => seed(data));
 afterAll(() => db.end())
 
+describe('PATH NOT FOUND for all -  /api/*', () => {
+    test('should respond 404 if path not found', () => {
+        return request(app)
+            .get("/api/not-a-route")
+            .expect(404)
+            .then((response) => {
+                const message = { msg: "path not found" };
+                expect(response.body).toEqual(message);
+            })
+    });
+
+});
+
 describe('/api/topics', () => {
     describe('HAPPY PATH GET /api/topics', () => {
         test('200 OK - Should return a 200 status code if succesful', () => {
@@ -38,18 +51,7 @@ describe('/api/topics', () => {
                 })
         });
     });
-    describe('SAD PATH GET /api/topics', () => {
-        test('should respond 404 if path not found', () => {
-            return request(app)
-                .get("/api/not-a-route")
-                .expect(404)
-                .then((response) => {
-                    const message = { msg: "path not found" };
-                    expect(response.body).toEqual(message);
-                })
-        });
 
-    });
 
 });
 describe('/api/articles/:article_id', () => {
@@ -64,7 +66,7 @@ describe('/api/articles/:article_id', () => {
                 .get("/api/articles/2")
                 .expect(200)
                 .then((response) => {
-                    console.log(response.body)
+
                     expect(typeof response.body).toBe('object');
                     expect(Array.isArray(response)).toBe(false)
                 })
@@ -89,12 +91,13 @@ describe('/api/articles/:article_id', () => {
 
     })
     describe('SAD PATH GET /api/articles/:article_id', () => {
-        test('should respond 404 if path not found', () => {
+
+        test('should respond 404 if path valid but not found', () => {
             return request(app)
-                .get("/api/not-a-route")
+                .get("/api/articles/100000000")
                 .expect(404)
                 .then((response) => {
-                    const message = { msg: "path not found" };
+                    const message = { msg: `No article found for article_id: 100000000` };
                     expect(response.body).toEqual(message);
                 })
         });
@@ -109,3 +112,4 @@ describe('/api/articles/:article_id', () => {
         });
     });
 });
+
