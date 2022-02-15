@@ -207,13 +207,24 @@ describe('/api/articles/:article_id', () => {
                 })
 
         });
-        test('should return bad request if body has incorrect data type', () => {
+        test('should return bad request if body value has incorrect data type', () => {
             return request(app)
                 .patch('/api/articles/2')
                 .send({ inc_votes: 'word' })
                 .expect(400)
                 .then((response) => {
                     const message = { msg: "Incorrect data in body - must be int" }
+                    expect(response.body).toEqual(message)
+                })
+
+        });
+        test('should return bad request if body key is incorrect', () => {
+            return request(app)
+                .patch('/api/articles/2')
+                .send({ inc_votess: 2 })
+                .expect(400)
+                .then((response) => {
+                    const message = { msg: "The body key submitted is incorrect" }
                     expect(response.body).toEqual(message)
                 })
 

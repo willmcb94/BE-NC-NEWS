@@ -33,6 +33,13 @@ exports.sendArticleVote = async (id, body) => {
             msg: `No body submitted`,
         });
 
+    } else if (Object.keys(body)[0] !== 'inc_votes' && Object.keys(body)[0] !== undefined) {
+
+        return Promise.reject({
+            status: 400,
+            msg: `The body key submitted is incorrect`,
+        });
+
     } else if (typeof body.inc_votes !== 'number' && typeof body.inc_votes !== undefined) {
 
         return Promise.reject({
