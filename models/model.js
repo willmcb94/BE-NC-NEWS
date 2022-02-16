@@ -12,7 +12,7 @@ exports.fetchUsers = async () => {
 }
 
 exports.fetchArticlesSorted = async () => {
-    const { rows } = await db.query('SELECT * FROM Articles ORDER BY created_at DESC;');
+    const { rows } = await db.query('SELECT * FROM articles ORDER BY created_at DESC;');
     return rows
 }
 
