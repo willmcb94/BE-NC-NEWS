@@ -12,12 +12,19 @@ exports.fetchUsers = async () => {
 }
 
 exports.fetchArticlesSorted = async () => {
-    const { rows } = await db.query('SELECT * FROM articles ORDER BY created_at DESC;');
+    const { rows } = await db.query('SELECT articles.*, CAST(COUNT(comments.article_id) AS INT) AS comment_count FROM comments LEFT JOIN articles ON articles.article_id = comments.article_id GROUP BY articles.article_id ORDER BY created_at DESC;');
+    console.log(rows)
+
     return rows
 }
 
 exports.fetchArticleById = async (id) => {
-    const { rows } = await db.query('SELECT * FROM articles WHERE article_id = $1;', [id])
+
+    const { rows } = await db.query(`SELECT articles. *,
+    CAST(COUNT(comments.article_id) AS INT) AS comment_count
+    FROM comments right JOIN articles ON comments.article_id = articles.article_id
+    WHERE articles.article_id = $1
+    GROUP BY articles.article_id;`, [id])
 
 
     if (rows[0] === undefined) {
