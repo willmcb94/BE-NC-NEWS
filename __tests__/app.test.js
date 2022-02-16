@@ -83,7 +83,9 @@ describe('/api/articles/:article_id', () => {
                         body: "I find this existence challenging",
                         topic: "mitch",
                         created_at: new Date(1594329060000 - 3600000).toString(),
-                        votes: 100
+                        votes: 100,
+                        comment_count: expect.any(Number)
+
                     }))
 
                 })
@@ -147,7 +149,8 @@ describe('/api/articles/:article_id', () => {
                         body: "I find this existence challenging",
                         topic: "mitch",
                         created_at: expect.any(String),
-                        votes: 101
+                        votes: 101,
+
                     }))
 
                 })
@@ -165,7 +168,9 @@ describe('/api/articles/:article_id', () => {
                         body: "I find this existence challenging",
                         topic: "mitch",
                         created_at: expect.any(String),
-                        votes: 0
+                        votes: 0,
+
+
                     }))
 
                 })
@@ -281,7 +286,9 @@ describe('/api/articles', () => {
                             body: expect.any(String),
                             topic: expect.any(String),
                             created_at: expect.any(String),
-                            votes: expect.any(Number)
+                            votes: expect.any(Number),
+                            comment_count: expect.any(Number)
+
                         }))
                     })
                 });
