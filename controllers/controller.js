@@ -1,4 +1,4 @@
-const { fetchTopics, fetchArticleById, sendArticleVote, fetchUsers } = require("../models/model");
+const { fetchTopics, fetchArticleById, sendArticleVote, fetchUsers, fetchArticlesSorted } = require("../models/model");
 
 exports.getTopics = async (req, res, next) => {
     try {
@@ -16,7 +16,14 @@ exports.getUsers = async (req, res, next) => {
         next(err);
     }
 }
-
+exports.getArticlesSorted = async (req, res, next) => {
+    try {
+        const articles = await fetchArticlesSorted();
+        res.status(200).send({ articles: articles })
+    } catch (err) {
+        next(err);
+    }
+}
 exports.getArticleById = async (req, res, next) => {
     try {
         const article = await fetchArticleById(req.params.article_id);
@@ -33,7 +40,7 @@ exports.updateArticleVotes = async (req, res, next) => {
 
         res.status(200).send(updatedVotes);
     } catch (err) {
-        console.log(err)
+
         next(err);
     }
 }
