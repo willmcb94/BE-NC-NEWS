@@ -1,4 +1,4 @@
-const { fetchTopics, fetchArticleById, sendArticleVote, fetchUsers, fetchArticlesSorted, addArticleComment, checkArticleExists } = require("../models/model");
+const { fetchTopics, fetchArticleById, sendArticleVote, fetchUsers, fetchArticlesSorted, addArticleComment, checkArticleExists, fetchArticleComments } = require("../models/model");
 
 exports.getTopics = async (req, res, next) => {
     try {
@@ -47,13 +47,21 @@ exports.updateArticleVotes = async (req, res, next) => {
 
 
 exports.postComment = async (req, res, next) => {
-    console.log('test5')
     try {
         const comment = await addArticleComment(req.params.article_id, req.body);
         res.status(201).send({ comment: comment })
     } catch (err) {
-        console.log(err)
+
         next(err);
     }
 }
 
+exports.getComment = async (req, res, next) => {
+    try {
+        const comments = await fetchArticleComments(req.params.article_id)
+
+        res.status(200).send({ comments: comments })
+    } catch (err) {
+        next(err)
+    }
+}
