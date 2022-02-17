@@ -237,6 +237,8 @@ describe('/api/articles/:article_id', () => {
 
     });
 });
+
+
 describe('/api/users', () => {
     describe('HAPPY PATH GET /api/users', () => {
         test('200 OK - Should return a 200 status code if succesful', () => {
@@ -306,3 +308,118 @@ describe('/api/articles', () => {
 
     })
 })
+
+describe('/api/articles/:article_id/comments', () => {
+    const newComment = {
+        username: 'butter_bridge',
+        body: 'my comment'
+    }
+    describe('HAPPY PATH POST /api/articles/:article_id/comments', () => {
+        test('201 CREATED - Should add comment inputted with correct properties/values & return it', () => {
+
+            return request(app)
+                .post('/api/articles/1/comments')
+                .send(newComment)
+                .expect(201)
+                .then((response) => {
+                    expect(response.body.comment).toEqual({
+                        article_id: 1,
+                        author: 'butter_bridge',
+                        body: 'my comment',
+                        votes: 0,
+                        created_at: expect.any(String),
+                        comment_id: expect.any(Number)
+                    });
+
+                })
+        });
+    });
+    describe('SAD PATH POST /api/articles/:article_id/comments', () => {
+        test('should respond 400 if bad request on ID', () => {
+            return request(app)
+                .post('/api/articles/not-a-number/comments')
+                .send(newComment)
+                .expect(400)
+                .then((response) => {
+                    const message = { msg: "Bad request - not a ID number" };
+                    expect(response.body).toEqual(message);
+                })
+        });
+        test('should respond 404 if path valid but not found', () => {
+            return request(app)
+                .post("/api/articles/100000000/comments")
+                .expect(404)
+                .send(newComment)
+                .then((response) => {
+                    const message = { msg: `No article found for article_id: 100000000` };
+                    expect(response.body).toEqual(message);
+                })
+        })
+
+        test('should return bad request if input is empty', () => {
+
+            return request(app)
+                .post('/api/articles/1/comments')
+                .send({})
+                .expect(400)
+                .then((response) => {
+                    const message = { msg: "Empty input submitted" }
+                    expect(response.body).toEqual(message)
+                })
+        })
+
+    });
+    test('should return bad request if username key is incorrect', () => {
+        return request(app)
+            .post('/api/articles/1/comments')
+            .send({
+                user: 'hello',
+                body: 'test'
+            })
+            .expect(400)
+            .then((response) => {
+                const message = { msg: "incorrect key submitted, should be username & body" }
+                expect(response.body).toEqual(message)
+            })
+    });
+    test('should return bad request if body key is incorrect', () => {
+        return request(app)
+            .post('/api/articles/1/comments')
+            .send({
+                username: 'hello',
+                wrong: 'test'
+            })
+            .expect(400)
+            .then((response) => {
+                const message = { msg: "incorrect key submitted, should be username & body" }
+                expect(response.body).toEqual(message)
+            })
+    });
+    test('should return bad request if username value is not typeof string', () => {
+        return request(app)
+            .post('/api/articles/1/comments')
+            .send({
+                username: 2,
+                body: 'test'
+            })
+            .expect(400)
+            .then((response) => {
+                const message = { msg: "Username must be a string" }
+                expect(response.body).toEqual(message)
+            })
+    });
+    test('should return bad request if body value is not typeof string', () => {
+        return request(app)
+            .post('/api/articles/1/comments')
+            .send({
+                username: 'test',
+                body: 3
+            })
+            .expect(400)
+            .then((response) => {
+                const message = { msg: "Body must be a string" }
+                expect(response.body).toEqual(message)
+            })
+    });
+
+});
