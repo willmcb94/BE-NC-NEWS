@@ -322,14 +322,14 @@ describe('/api/articles/:article_id/comments', () => {
                 .send(newComment)
                 .expect(201)
                 .then((response) => {
-                    expect(response.body.comment).toEqual({
+                    expect(response.body.comment).toEqual(expect.objectContaining({
                         article_id: 1,
                         author: 'butter_bridge',
                         body: 'my comment',
                         votes: 0,
                         created_at: expect.any(String),
                         comment_id: expect.any(Number)
-                    });
+                    }))
 
                 })
         });
