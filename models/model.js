@@ -141,3 +141,13 @@ exports.addArticleComment = async (id, body) => {
     }
 }
 
+exports.fetchArticleComments = async (id) => {
+
+    await this.checkArticleExists(id)
+
+    const { rows } = await db.query(`SELECT comment_id, votes, created_at, author, body FROM comments WHERE article_id = $1`, [id])
+
+    return rows
+
+}
+
