@@ -552,4 +552,40 @@ describe('/api/articles/:article_id/comments', () => {
         })
     })
 });
+describe('/api/comments/:comment_id delete', () => {
+    describe('204 DELETE HAPPY PATH /api/comments/:comment_id', () => {
+        test('/api/comments/:comment_id - should respond 204 & delete restaurant', () => {
+            return request(app)
+                .delete('/api/comments/16')
+                .expect(204)
+                .then(() => {
+                    return db.query(`SELECT comment_id, votes, created_at, author, body FROM comments WHERE article_id = 6`)
+                })
+                .then((response) => {
+                    expect(response.rows).toEqual([])
+                })
+        })
 
+    })
+    describe('204 DELETE SAD PATH /api/comments/:comment_id', () => {
+        test('should respond 400 BAD REQUEST - if bad request on id', () => {
+            return request(app)
+                .delete('/api/comments/string')
+                .expect(400)
+                .then((response) => {
+                    const message = { msg: "Bad request - not a ID number" };
+                    expect(response.body).toEqual(message);
+                })
+        });
+        test('should respond 404 if path valid but not found', () => {
+            return request(app)
+                .delete("/api/comments/1000000")
+                .expect(404)
+                .then((response) => {
+                    const message = { msg: `No comment found for comment_id: 1000000` };
+                    expect(response.body).toEqual(message);
+                })
+        })
+
+    });
+})
