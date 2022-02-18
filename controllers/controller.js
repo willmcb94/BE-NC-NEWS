@@ -59,7 +59,7 @@ exports.postComment = async (req, res, next) => {
 
 exports.getComments = async (req, res, next) => {
     try {
-        const comments = await fetchArticleComments(req.params.article_id)
+        const [comments] = await Promise.all([fetchArticleComments(req.params.article_id), checkArticleExists(req.params.article_id)])
 
         res.status(200).send({ comments: comments })
     } catch (err) {

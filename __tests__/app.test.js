@@ -524,7 +524,7 @@ describe('/api/articles/:article_id/comments', () => {
                 .get("/api/articles/2/comments")
                 .expect(200)
                 .then((response) => {
-                    console.log(response)
+
                     expect(response.body.comments).toBeInstanceOf(Array),
                         expect(response.body.comments.length).toBe(0)
                 });

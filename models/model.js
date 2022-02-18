@@ -42,24 +42,14 @@ exports.fetchArticlesSorted = async (order = 'desc', sort_by = 'created_at', top
         queryStr += queryStrTwo
     } else {
         querys.push(topic)
-        console.log(topic, 'test')
+
         queryStr += ` WHERE topic = $1 `
         queryStr += queryStrTwo
 
     }
     const { rows } = await db.query(queryStr, querys)
     return rows
-    // if (topic === undefined) {
-    //     const { rows } = await db.query(`SELECT articles.*, CAST(COUNT(comments.article_id) AS INT) AS comment_count FROM comments LEFT JOIN articles ON articles.article_id = comments.article_id GROUP BY articles.article_id ORDER BY ${sort_by} ${order};`);
-    //     return rows
-    // } else {
-    //     const { rows } = await db.query(`SELECT articles. *,
-    //     CAST(COUNT(comments.article_id) AS INT) AS comment_count
-    //     FROM comments right JOIN articles ON comments.article_id = articles.article_id
-    //     WHERE topic = $1
-    //     GROUP BY articles.article_id ORDER BY ${sort_by} ${order};`, [topic])
-    //     return rows
-    // }
+
 }
 
 
@@ -188,7 +178,7 @@ exports.addArticleComment = async (id, body) => {
 
 exports.fetchArticleComments = async (id) => {
 
-    await this.checkArticleExists(id)
+
 
     const { rows } = await db.query(`SELECT comment_id, votes, created_at, author, body FROM comments WHERE article_id = $1`, [id])
 
