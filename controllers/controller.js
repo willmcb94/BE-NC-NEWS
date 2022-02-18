@@ -70,7 +70,7 @@ exports.getComments = async (req, res, next) => {
 exports.deleteCommentById = async (req, res, next) => {
     try {
         await removeCommentById(req.params.comment_id)
-        res.status(204).send()
+        res.sendStatus(204)
     } catch (err) {
         next(err)
     }

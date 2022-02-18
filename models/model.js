@@ -182,19 +182,15 @@ exports.fetchArticleComments = async (id) => {
 
 exports.removeCommentById = async (id) => {
 
-    const { rows: check } = await db.query(`SELECT * FROM comments WHERE comment_id = $1`, [id])
+    const { rows } = await db.query(`DELETE FROM comments WHERE comment_id = $1 RETURNING*;`, [id])
 
-    console.log(check, 'test')
-
-    if (check.length === 0) {
+    if (rows.length === 0) {
         return Promise.reject({
             status: 404,
             msg: `No comment found for comment_id: ${id}`,
         });
-
     } else {
 
-        const { rows } = await db.query(`DELETE FROM comments WHERE comment_id = $1 RETURNING*;`, [id])
         return rows
     }
 }
