@@ -1,4 +1,4 @@
-const { fetchTopics, fetchArticleById, sendArticleVote, fetchUsers, fetchArticlesSorted, addArticleComment, checkArticleExists, fetchArticleComments } = require("../models/model");
+const { fetchTopics, fetchArticleById, sendArticleVote, fetchUsers, fetchArticlesSorted, addArticleComment, checkArticleExists, fetchArticleComments, removeCommentById } = require("../models/model");
 
 exports.getTopics = async (req, res, next) => {
     try {
@@ -62,6 +62,15 @@ exports.getComments = async (req, res, next) => {
         const [comments] = await Promise.all([fetchArticleComments(req.params.article_id), checkArticleExists(req.params.article_id)])
 
         res.status(200).send({ comments: comments })
+    } catch (err) {
+        next(err)
+    }
+}
+
+exports.deleteCommentById = async (req, res, next) => {
+    try {
+        await removeCommentById(req.params.comment_id)
+        res.status(204).send()
     } catch (err) {
         next(err)
     }
