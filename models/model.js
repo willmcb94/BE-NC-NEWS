@@ -11,12 +11,47 @@ exports.fetchUsers = async () => {
     return rows
 }
 
-exports.fetchArticlesSorted = async () => {
-    const { rows } = await db.query('SELECT articles.*, CAST(COUNT(comments.article_id) AS INT) AS comment_count FROM comments LEFT JOIN articles ON articles.article_id = comments.article_id GROUP BY articles.article_id ORDER BY created_at DESC;');
+exports.fetchArticlesSorted = async (order = 'desc', sort_by = 'created_at', topic) => {
 
+    const { rows: categorys } = await db.query('SELECT * FROM topics')
+    const topics = categorys.map(topic => {
+        return topic.slug
+    })
 
+    if (![...topics, undefined].includes(topic)) {
+        return Promise.reject({ status: 400, msg: 'Bad request - invalid topic' });
+    }
+
+    if (!['article_id', 'title', 'topic', 'author', 'body', 'created_at', 'votes', 'comment_count'].includes(sort_by)) {
+        return Promise.reject({ status: 400, msg: 'Bad request - invalid query' });
+    }
+
+    if (!['asc', 'desc'].includes(order)) {
+        return Promise.reject({ status: 400, msg: 'Bad request - invalid order by, please use asc or desc' });
+    }
+    const querys = []
+
+    let queryStr = `SELECT articles. *,
+    CAST(COUNT(comments.article_id) AS INT) AS comment_count
+    FROM comments right
+    JOIN articles ON comments.article_id = articles.article_id`
+
+    const queryStrTwo = ` GROUP BY articles.article_id ORDER BY ${sort_by} ${order};`
+
+    if (topic === undefined) {
+        queryStr += queryStrTwo
+    } else {
+        querys.push(topic)
+
+        queryStr += ` WHERE topic = $1 `
+        queryStr += queryStrTwo
+
+    }
+    const { rows } = await db.query(queryStr, querys)
     return rows
+
 }
+
 
 exports.fetchArticleById = async (id) => {
 
@@ -143,11 +178,12 @@ exports.addArticleComment = async (id, body) => {
 
 exports.fetchArticleComments = async (id) => {
 
-    await this.checkArticleExists(id)
+
 
     const { rows } = await db.query(`SELECT comment_id, votes, created_at, author, body FROM comments WHERE article_id = $1`, [id])
 
     return rows
 
 }
+
 
