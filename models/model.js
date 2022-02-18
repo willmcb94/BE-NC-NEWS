@@ -11,12 +11,39 @@ exports.fetchUsers = async () => {
     return rows
 }
 
-exports.fetchArticlesSorted = async () => {
-    const { rows } = await db.query('SELECT articles.*, CAST(COUNT(comments.article_id) AS INT) AS comment_count FROM comments LEFT JOIN articles ON articles.article_id = comments.article_id GROUP BY articles.article_id ORDER BY created_at DESC;');
+exports.fetchArticlesSorted = async (order, sort_by, topic) => {
+    if (order === undefined) {
+        order = 'desc'
+    }
+    if (sort_by === undefined) {
+        sort_by = 'created_at'
+    }
 
+    if (!['mitch', 'cats', undefined].includes(topic)) {
+        return Promise.reject({ status: 400, msg: 'Bad request - invalid topic' });
+    }
 
-    return rows
+    if (!['article_id', 'title', 'topic', 'author', 'body', 'created_at', 'votes', 'comment_count'].includes(sort_by)) {
+        return Promise.reject({ status: 400, msg: 'Bad request - invalid query' });
+    }
+
+    if (!['asc', 'desc'].includes(order)) {
+        return Promise.reject({ status: 400, msg: 'Bad request - invalid order by, please use asc or desc' });
+    }
+
+    if (topic === undefined) {
+        const { rows } = await db.query(`SELECT articles.*, CAST(COUNT(comments.article_id) AS INT) AS comment_count FROM comments LEFT JOIN articles ON articles.article_id = comments.article_id GROUP BY articles.article_id ORDER BY ${sort_by} ${order};`);
+        return rows
+    } else {
+        const { rows } = await db.query(`SELECT articles. *,
+        CAST(COUNT(comments.article_id) AS INT) AS comment_count
+        FROM comments right JOIN articles ON comments.article_id = articles.article_id
+        WHERE topic = $1
+        GROUP BY articles.article_id ORDER BY ${sort_by} ${order};`, [topic])
+        return rows
+    }
 }
+
 
 exports.fetchArticleById = async (id) => {
 
@@ -143,7 +170,7 @@ exports.addArticleComment = async (id, body) => {
 
 exports.fetchArticleComments = async (id) => {
 
-    await this.checkArticleExists(id)
+
 
     const { rows } = await db.query(`SELECT comment_id, votes, created_at, author, body FROM comments WHERE article_id = $1`, [id])
 

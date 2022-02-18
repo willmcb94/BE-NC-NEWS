@@ -278,6 +278,7 @@ describe('/api/articles', () => {
                 .get("/api/articles")
                 .expect(200)
                 .then((response) => {
+
                     expect(response.body.articles).toBeInstanceOf(Array);
                     expect(response.body.articles.length).toBeGreaterThan(0);
                     response.body.articles.forEach(article => {
@@ -295,7 +296,7 @@ describe('/api/articles', () => {
                     })
                 });
         })
-        test('200 OK - should return array sorted by date created', () => {
+        test('200 OK - should return array sorted by date created if no query input', () => {
             return request(app)
                 .get("/api/articles")
                 .expect(200)
@@ -305,10 +306,81 @@ describe('/api/articles', () => {
                     });
                 })
         });
-
+        test('200 OK - should return array sorted by inputted query, ordered by default DESC', () => {
+            return request(app)
+                .get("/api/articles?sort_by=comment_count")
+                .expect(200)
+                .then((response) => {
+                    expect(response.body.articles).toBeSortedBy('comment_count', {
+                        descending: true,
+                    });
+                })
+        });
+        test('200 OK - should return array ordered by asc if inputted', () => {
+            return request(app)
+                .get("/api/articles?order=asc")
+                .expect(200)
+                .then((response) => {
+                    expect(response.body.articles).toBeSortedBy('created_at');
+                })
+        });
+        test('200 OK - should return array sorted and ordered by correct input', () => {
+            return request(app)
+                .get("/api/articles?sort_by=votes&order=asc")
+                .expect(200)
+                .then((response) => {
+                    expect(response.body.articles).toBeSortedBy('votes');
+                })
+        });
+        test('200 OK - should return array filterd down by topic', () => {
+            return request(app)
+                .get("/api/articles?topic=cats")
+                .expect(200)
+                .then((response) => {
+                    expect(response.body.articles).toEqual([{
+                        article_id: 5,
+                        title: 'UNCOVERED: catspiracy to bring down democracy',
+                        topic: 'cats',
+                        author: 'rogersop',
+                        body: 'Bastet walks amongst us, and the cats are taking arms!',
+                        created_at: '2020-08-03T13:14:00.000Z',
+                        votes: 0,
+                        comment_count: 2
+                    }]);
+                })
+        });
     })
-
-
+    describe('SAD PATH /api/articles  ', () => {
+        describe('SAD PATH queries /api/articles ', () => {
+            test('Should be 400 bad request for invalid sort by', () => {
+                return request(app)
+                    .get("/api/articles?sort_by=invalid-input")
+                    .expect(400)
+                    .then((response) => {
+                        const message = { msg: "Bad request - invalid query" };
+                        expect(response.body).toEqual(message);
+                    })
+            });
+            test('Should be 400 bad request for invalid order by', () => {
+                return request(app)
+                    .get("/api/articles?order=invalid")
+                    .expect(400)
+                    .then((response) => {
+                        const message = { msg: "Bad request - invalid order by, please use asc or desc" };
+                        expect(response.body).toEqual(message);
+                    })
+            });
+            test('Should be 400 bad request for invalid topic', () => {
+                return request(app)
+                    .get("/api/articles?topic=invalid")
+                    .expect(400)
+                    .then((response) => {
+                        const message = { msg: "Bad request - invalid topic" };
+                        expect(response.body).toEqual(message);
+                    })
+            });
+        });
+    });
 
 })
 
@@ -424,55 +496,5 @@ describe('/api/articles/:article_id/comments', () => {
                 expect(response.body).toEqual(message)
             })
     });
-    describe('HAPPY PATH GET /api/articles/:article_id/comments', () => {
-        test('200 OK - Should return an array of objects with correct data', () => {
-            return request(app)
-                .get("/api/articles/1/comments")
-                .expect(200)
-                .then((response) => {
-                    expect(response.body.comments).toBeInstanceOf(Array),
-                        expect(response.body.comments.length).toBeGreaterThan(0),
-                        response.body.comments.forEach(comment => {
-                            expect(comment).toEqual(expect.objectContaining({
-                                author: expect.any(String),
-                                comment_id: expect.any(Number),
-                                body: expect.any(String),
-                                created_at: expect.any(String),
-                                votes: expect.any(Number),
-                            }))
-                        })
-                })
-        })
-        test('200 OK - Should return an empty array of article has no comments', () => {
-            return request(app)
-                .get("/api/articles/2/comments")
-                .expect(200)
-                .then((response) => {
-                    console.log(response)
-                    expect(response.body.comments).toBeInstanceOf(Array),
-                        expect(response.body.comments.length).toBe(0)
-                });
-        })
-    })
 
-    describe('SAD PATH GET /api/articles/:article_id/comments', () => {
-        test('should respond 400 if bad request on ID', () => {
-            return request(app)
-                .get('/api/articles/not-a-number/comments')
-                .expect(400)
-                .then((response) => {
-                    const message = { msg: "Bad request - not a ID number" };
-                    expect(response.body).toEqual(message);
-                })
-        });
-        test('should respond 404 if path valid but not found', () => {
-            return request(app)
-                .get("/api/articles/100000000/comments")
-                .expect(404)
-                .then((response) => {
-                    const message = { msg: `No article found for article_id: 100000000` };
-                    expect(response.body).toEqual(message);
-                })
-        })
-    })
 });

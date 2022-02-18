@@ -18,7 +18,8 @@ exports.getUsers = async (req, res, next) => {
 }
 exports.getArticlesSorted = async (req, res, next) => {
     try {
-        const articles = await fetchArticlesSorted();
+
+        const articles = await fetchArticlesSorted(req.query.order, req.query.sort_by, req.query.topic);
         res.status(200).send({ articles: articles })
     } catch (err) {
         next(err);
@@ -56,9 +57,9 @@ exports.postComment = async (req, res, next) => {
     }
 }
 
-exports.getComment = async (req, res, next) => {
+exports.getComments = async (req, res, next) => {
     try {
-        const comments = await fetchArticleComments(req.params.article_id)
+        const [comments] = await Promise.all([fetchArticleComments(req.params.article_id), await this.checkArticleExists(req.params.article_id)])
 
         res.status(200).send({ comments: comments })
     } catch (err) {
