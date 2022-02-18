@@ -11,15 +11,14 @@ exports.fetchUsers = async () => {
     return rows
 }
 
-exports.fetchArticlesSorted = async (order, sort_by, topic) => {
-    if (order === undefined) {
-        order = 'desc'
-    }
-    if (sort_by === undefined) {
-        sort_by = 'created_at'
-    }
+exports.fetchArticlesSorted = async (order = 'desc', sort_by = 'created_at', topic) => {
 
-    if (!['mitch', 'cats', undefined].includes(topic)) {
+    const { rows: categorys } = await db.query('SELECT * FROM topics')
+    const topics = categorys.map(topic => {
+        return topic.slug
+    })
+
+    if (![...topics, undefined].includes(topic)) {
         return Promise.reject({ status: 400, msg: 'Bad request - invalid topic' });
     }
 
@@ -30,18 +29,37 @@ exports.fetchArticlesSorted = async (order, sort_by, topic) => {
     if (!['asc', 'desc'].includes(order)) {
         return Promise.reject({ status: 400, msg: 'Bad request - invalid order by, please use asc or desc' });
     }
+    const querys = []
+
+    let queryStr = `SELECT articles. *,
+    CAST(COUNT(comments.article_id) AS INT) AS comment_count
+    FROM comments right
+    JOIN articles ON comments.article_id = articles.article_id`
+
+    const queryStrTwo = ` GROUP BY articles.article_id ORDER BY ${sort_by} ${order};`
 
     if (topic === undefined) {
-        const { rows } = await db.query(`SELECT articles.*, CAST(COUNT(comments.article_id) AS INT) AS comment_count FROM comments LEFT JOIN articles ON articles.article_id = comments.article_id GROUP BY articles.article_id ORDER BY ${sort_by} ${order};`);
-        return rows
+        queryStr += queryStrTwo
     } else {
-        const { rows } = await db.query(`SELECT articles. *,
-        CAST(COUNT(comments.article_id) AS INT) AS comment_count
-        FROM comments right JOIN articles ON comments.article_id = articles.article_id
-        WHERE topic = $1
-        GROUP BY articles.article_id ORDER BY ${sort_by} ${order};`, [topic])
-        return rows
+        querys.push(topic)
+        console.log(topic, 'test')
+        queryStr += ` WHERE topic = $1 `
+        queryStr += queryStrTwo
+
     }
+    const { rows } = await db.query(queryStr, querys)
+    return rows
+    // if (topic === undefined) {
+    //     const { rows } = await db.query(`SELECT articles.*, CAST(COUNT(comments.article_id) AS INT) AS comment_count FROM comments LEFT JOIN articles ON articles.article_id = comments.article_id GROUP BY articles.article_id ORDER BY ${sort_by} ${order};`);
+    //     return rows
+    // } else {
+    //     const { rows } = await db.query(`SELECT articles. *,
+    //     CAST(COUNT(comments.article_id) AS INT) AS comment_count
+    //     FROM comments right JOIN articles ON comments.article_id = articles.article_id
+    //     WHERE topic = $1
+    //     GROUP BY articles.article_id ORDER BY ${sort_by} ${order};`, [topic])
+    //     return rows
+    // }
 }
 
 
@@ -170,11 +188,12 @@ exports.addArticleComment = async (id, body) => {
 
 exports.fetchArticleComments = async (id) => {
 
-
+    await this.checkArticleExists(id)
 
     const { rows } = await db.query(`SELECT comment_id, votes, created_at, author, body FROM comments WHERE article_id = $1`, [id])
 
     return rows
 
 }
+
 

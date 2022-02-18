@@ -337,16 +337,19 @@ describe('/api/articles', () => {
                 .get("/api/articles?topic=cats")
                 .expect(200)
                 .then((response) => {
-                    expect(response.body.articles).toEqual([{
-                        article_id: 5,
-                        title: 'UNCOVERED: catspiracy to bring down democracy',
-                        topic: 'cats',
-                        author: 'rogersop',
-                        body: 'Bastet walks amongst us, and the cats are taking arms!',
-                        created_at: '2020-08-03T13:14:00.000Z',
-                        votes: 0,
-                        comment_count: 2
-                    }]);
+                    response.body.articles.forEach(article => {
+                        expect(article).toEqual(expect.objectContaining({
+                            author: expect.any(String),
+                            title: expect.any(String),
+                            article_id: expect.any(Number),
+                            body: expect.any(String),
+                            topic: expect.any(String),
+                            created_at: expect.any(String),
+                            votes: expect.any(Number),
+                            comment_count: expect.any(Number)
+
+                        }))
+                    })
                 })
         });
     })
@@ -383,6 +386,7 @@ describe('/api/articles', () => {
     });
 
 })
+
 
 describe('/api/articles/:article_id/comments', () => {
     const newComment = {
@@ -496,5 +500,56 @@ describe('/api/articles/:article_id/comments', () => {
                 expect(response.body).toEqual(message)
             })
     });
+    describe('HAPPY PATH GET /api/articles/:article_id/comments', () => {
+        test('200 OK - Should return an array of objects with correct data', () => {
+            return request(app)
+                .get("/api/articles/1/comments")
+                .expect(200)
+                .then((response) => {
+                    expect(response.body.comments).toBeInstanceOf(Array),
+                        expect(response.body.comments.length).toBeGreaterThan(0),
+                        response.body.comments.forEach(comment => {
+                            expect(comment).toEqual(expect.objectContaining({
+                                author: expect.any(String),
+                                comment_id: expect.any(Number),
+                                body: expect.any(String),
+                                created_at: expect.any(String),
+                                votes: expect.any(Number),
+                            }))
+                        })
+                })
+        })
+        test('200 OK - Should return an empty array of article has no comments', () => {
+            return request(app)
+                .get("/api/articles/2/comments")
+                .expect(200)
+                .then((response) => {
+                    console.log(response)
+                    expect(response.body.comments).toBeInstanceOf(Array),
+                        expect(response.body.comments.length).toBe(0)
+                });
+        })
+    })
 
+    describe('SAD PATH GET /api/articles/:article_id/comments', () => {
+        test('should respond 400 if bad request on ID', () => {
+            return request(app)
+                .get('/api/articles/not-a-number/comments')
+                .expect(400)
+                .then((response) => {
+                    const message = { msg: "Bad request - not a ID number" };
+                    expect(response.body).toEqual(message);
+                })
+        });
+        test('should respond 404 if path valid but not found', () => {
+            return request(app)
+                .get("/api/articles/100000000/comments")
+                .expect(404)
+                .then((response) => {
+                    const message = { msg: `No article found for article_id: 100000000` };
+                    expect(response.body).toEqual(message);
+                })
+        })
+    })
 });
+
