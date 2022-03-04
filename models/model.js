@@ -1,5 +1,6 @@
 
 const db = require('../db/connection')
+const { readFile } = require("fs/promises");
 
 exports.fetchTopics = async () => {
     const { rows } = await db.query('SELECT * FROM topics');
@@ -195,4 +196,8 @@ exports.removeCommentById = async (id) => {
     }
 }
 
+exports.fetchEndpoints = async () => {
+    const endPoints = await readFile('./endpoints.json', 'utf-8')
+    return endPoints
+}
 

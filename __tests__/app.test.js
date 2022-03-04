@@ -506,9 +506,11 @@ describe('/api/articles/:article_id/comments', () => {
                 .get("/api/articles/1/comments")
                 .expect(200)
                 .then((response) => {
+                    console.log(response.body.comments)
                     expect(response.body.comments).toBeInstanceOf(Array),
                         expect(response.body.comments.length).toBeGreaterThan(0),
                         response.body.comments.forEach(comment => {
+
                             expect(comment).toEqual(expect.objectContaining({
                                 author: expect.any(String),
                                 comment_id: expect.any(Number),
@@ -589,3 +591,14 @@ describe('/api/comments/:comment_id delete', () => {
 
     });
 })
+
+// describe('GET: HAPPY PATH /api', () => {
+//     test('status 200: should return object of all api endpoints', () => {
+//         return request(app)
+//             .get("/api")
+//             .expect(200)
+
+
+
+//     });
+// });

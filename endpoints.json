@@ -1,17 +1,99 @@
 {
   "GET /api": {
-    "description": "serves up a json representation of all the available endpoints of the api"
+    "description": "serves up a json representation of all the available endpoints of the api",
+    "queries": [],
+    "exampleResponse": {
+      "GET /api/topics": {
+        "description": "serves an array of all topics",
+        "queries": [],
+        "exampleResponse": {
+          "topics": [
+            {
+              "slug": "mitchs",
+              "description": "The man, the Mitch, the legend"
+            },
+            {
+              "slug": "cats",
+              "description": "Not dogs"
+            },
+            {
+              "description": "what books are made of",
+              "slug": "paper"
+            }
+          ]
+        }
+      },
+      "GET /api/articles": {
+        "description": "serves an array of all articles, can sort articles",
+        "queries": [
+          "topic",
+          "sort_by",
+          "order"
+        ],
+        "exampleResponse": {
+          "articles": [
+            {
+              "title": "Seafood substitutions are increasing",
+              "topic": "cooking",
+              "author": "weegembump",
+              "body": "Text from the article..",
+              "created_at": 1527695953341
+            }
+          ]
+        }
+      },
+      "GET /api/users": {
+        "description": "serves an array of all users",
+        "queries": [],
+        "exampleResponse": {
+          "users": [
+            {
+              "username": "butter_bridge",
+              "name": "jonny",
+              "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
+            },
+            {
+              "username": "icellusedkars",
+              "name": "sam",
+              "avatar_url": "https://avatars2.githubusercontent.com/u/24604688?s=460&v=4"
+            },
+            {
+              "username": "rogersop",
+              "name": "paul",
+              "avatar_url": "https://avatars2.githubusercontent.com/u/24394918?s=400&v=4"
+            }
+          ]
+        }
+      }
+    }
   },
   "GET /api/topics": {
     "description": "serves an array of all topics",
     "queries": [],
     "exampleResponse": {
-      "topics": [{ "slug": "football", "description": "Footie!" }]
+      "topics": [
+        {
+          "slug": "mitchs",
+          "description": "The man, the Mitch, the legend"
+        },
+        {
+          "slug": "cats",
+          "description": "Not dogs"
+        },
+        {
+          "description": "what books are made of",
+          "slug": "paper"
+        }
+      ]
     }
   },
   "GET /api/articles": {
-    "description": "serves an array of all topics",
-    "queries": ["author", "topic", "sort_by", "order"],
+    "description": "serves an array of all articles, can sort articles",
+    "queries": [
+      "topic",
+      "sort_by",
+      "order"
+    ],
     "exampleResponse": {
       "articles": [
         {
@@ -23,5 +105,114 @@
         }
       ]
     }
+  },
+  "GET /api/users": {
+    "description": "serves an array of all users",
+    "queries": [],
+    "exampleResponse": {
+      "users": [
+        {
+          "username": "butter_bridge",
+          "name": "jonny",
+          "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
+        },
+        {
+          "username": "icellusedkars",
+          "name": "sam",
+          "avatar_url": "https://avatars2.githubusercontent.com/u/24604688?s=460&v=4"
+        },
+        {
+          "username": "rogersop",
+          "name": "paul",
+          "avatar_url": "https://avatars2.githubusercontent.com/u/24394918?s=400&v=4"
+        }
+      ]
+    }
+  },
+  "GET /api/articles/:article_id": {
+    "description": "Serves an indivdual article based on ID submitted",
+    "queries": [],
+    "exampleResponse": {
+      "article": {
+        "article_id": 1,
+        "title": "Living in the shadow of a great man",
+        "topic": "mitch",
+        "author": "butter_bridge",
+        "body": "I find this existence challenging",
+        "created_at": "Thu Jul 09 2020 21:11:00 GMT+0100 (British Summer Time)",
+        "votes": 100,
+        "comment_count": 11
+      }
+    }
+  },
+  "PATCH /api/articles/:article_id": {
+    "description": "Updates an idivdual article based by votes given and returns updated article, user needs to input here",
+    "queries": [],
+    "exampleResponse": {
+      "article": {
+        "article_id": 1,
+        "title": "Living in the shadow of a great man",
+        "topic": "mitch",
+        "author": "butter_bridge",
+        "body": "I find this existence challenging",
+        "created_at": "Thu Jul 09 2020 21:11:00 GMT+0100 (British Summer Time)",
+        "votes": 101,
+        "comment_count": 11
+      }
+    }
+  },
+  "GET /api/articles/:article_id/comments": {
+    "description": "Returns an array of comments for the given article_id",
+    "queries": [],
+    "exampleResponse": [
+      {
+        "comment_id": 2,
+        "votes": 14,
+        "created_at": "2020-10-31T03: 03: 00.000Z",
+        "author": "butter_bridge",
+        "body": "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky."
+      },
+      {
+        "comment_id": 3,
+        "votes": 100,
+        "created_at": "2020-03-01T01:13:00.000Z",
+        "author": "icellusedkars",
+        "body": "Replacing the quiet elegance of the dark suit and tie with the casual indifference of these muted earth tones is a form of fashion suicide, but, uh, call me crazy — onyou it works."
+      },
+      {
+        "comment_id": 4,
+        "votes": -100,
+        "created_at": "2020-02-23T12:01:00.000Z",
+        "author": "icellusedkars",
+        "body": "I carry a log — yes. Is it funny to you? It is not to me."
+      },
+      {
+        "comment_id": 5,
+        "votes": 0,
+        "created_at": "2020-11-03T21:00:00.000Z",
+        "author": "icellusedkars",
+        "body": "I hate streaming noses"
+      },
+      {
+        "comment_id": 6,
+        "votes": 0,
+        "created_at": "2020-04-11T21:02:00.000Z",
+        "author": "icellusedkars",
+        "body": "I hate streaming eyes even more"
+      }
+    ]
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "Adds a new comment to comments array of given article_id given with username & body of the comment - then returns posted comment to the user",
+    "queries": [],
+    "exampleResponse": {
+      "username": "butter_bridge",
+      "body": "my comment"
+    }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "Delete's the given comment by comment_id",
+    "queries": [],
+    "exampleResponse": "Status 204 - but response has no content"
   }
 }
