@@ -506,7 +506,7 @@ describe('/api/articles/:article_id/comments', () => {
                 .get("/api/articles/1/comments")
                 .expect(200)
                 .then((response) => {
-                    console.log(response.body.comments)
+
                     expect(response.body.comments).toBeInstanceOf(Array),
                         expect(response.body.comments.length).toBeGreaterThan(0),
                         response.body.comments.forEach(comment => {
