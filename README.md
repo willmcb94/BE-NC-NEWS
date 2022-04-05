@@ -33,7 +33,7 @@ The below will be need to be installed globally on your machine.
 Please fork the project to your own Github profile and then go ahead
 and clone the repo.
 
-Once cloned in your terminal make your way to the directory you wish to keep the repo and then
+Once cloned in your terminal make your way to the directory where you wish to keep the repo and then
 run this command -
 
 ```
@@ -95,7 +95,7 @@ To exit please type \q
 ## Now everything is setup
 
 You can go ahead and explore the repo and make changes as you
-chooose. There is also a full test enviroment setup, feel free
+choose. There is also a full test enviroment setup, feel free
 to run these tests with the following command which will run the
 full test suite -
 
